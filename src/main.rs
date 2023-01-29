@@ -1,37 +1,26 @@
-use console::{style, Term};
-use dialoguer::{theme::ColorfulTheme, Select};
-use todo_rust::utils::read_line;
-use todo_rust::Todos;
+use std::cell::RefCell;
+use todo_rust::cli::{print_catching_message, prompt_action, render_title, Action};
+use todo_rust::todo::Todos;
 
-fn main() -> std::io::Result<()> {
-    let term = Term::stdout();
-    Todos::new();
+fn main() {
+    let todos = RefCell::new(Todos::new());
+    let mut actions = [
+        Action {
+            label: "asdas",
+            action: Box::new(|| todos.borrow_mut().add("qwe")),
+        },
+        Action {
+            label: "asd",
+            action: Box::new(|| todos.borrow_mut().add("qwe")),
+        },
+    ];
+
+    render_title();
 
     loop {
-        let line = read_line().unwrap();
-
-        match line.trim_end() {
-            "colored" => {
-                term.write_line(format!("{}", style("LOH").cyan()).as_str())?;
-            }
-            "select" => {
-                let items = vec!["Item 1", "item 2"];
-                let selection = Select::with_theme(&ColorfulTheme::default())
-                    .items(&items)
-                    .default(0)
-                    .interact_on_opt(&Term::stderr())?;
-
-                match selection {
-                    Some(index) => println!("User selected item : {}", items[index]),
-                    None => println!("User did not select anything"),
-                }
-            }
-            _ => {
-                println!("break");
-                break;
-            }
+        if prompt_action(&mut actions).is_none() {
+            print_catching_message("You haven't chosen anything, i'm leaving, see you soon!");
+            break;
         }
     }
-
-    Ok(())
 }
