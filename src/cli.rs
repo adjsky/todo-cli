@@ -10,7 +10,7 @@ pub struct Action<'a> {
 }
 
 pub fn prompt_action(actions: &mut [Action]) -> Option<()> {
-    println!("{} {}", "?".yellow(), "What do you want me to do?".bold());
+    print_message(Message::WhatToDo);
 
     let labels: Vec<&str> = actions.iter().map(|action| action.label).collect();
 
@@ -38,14 +38,23 @@ pub fn read_line() -> Option<String> {
     }
 }
 
-pub fn render_title() {
-    println!("{}", TITLE_TEXT.gradient(Color::Red));
+pub enum Message {
+    NothingChosen,
+    NoTodos,
+    HereYourTodos,
+    WhatToDo,
+    Title,
 }
 
-pub fn print_catching_message(message: &str) {
-    println!("{}", message.red());
-}
-
-pub fn print_message(message: &str) {
-    println!("{}", message.yellow());
+pub fn print_message(message: Message) {
+    match message {
+        Message::NothingChosen => println!(
+            "{}",
+            "You haven't chosen anything, i'm leaving, see you soon!".red()
+        ),
+        Message::NoTodos => println!("{}", "You have no todos!".yellow()),
+        Message::HereYourTodos => println!("{}", "Here are your todos!".yellow()),
+        Message::WhatToDo => println!("{} {}", "?".yellow(), "What do you want me to do?".bold()),
+        Message::Title => println!("{}", TITLE_TEXT.gradient(Color::Red)),
+    }
 }

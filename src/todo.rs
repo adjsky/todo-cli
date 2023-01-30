@@ -3,6 +3,7 @@ use nanoid::nanoid;
 pub struct Todo {
     pub id: String,
     pub done: bool,
+    pub title: String,
     pub description: String,
 }
 
@@ -15,19 +16,28 @@ impl Todos {
         Todos { todos: vec![] }
     }
 
-    pub fn add(&mut self, description: &str) {
+    pub fn add(&mut self, title: &str, description: &str) {
         self.todos.push(Todo {
             id: nanoid!(),
             done: false,
+            title: String::from(title),
             description: String::from(description),
         })
     }
 
     pub fn mark_as_done(&mut self, id: &str) {
-        self.todos.iter().position(|todo| todo.id == id);
+        let position = self.todos.iter().position(|todo| todo.id == id);
+
+        if let Some(index) = position {
+            self.todos[index].done = true
+        }
     }
 
     pub fn remove(&mut self, id: &str) {
         self.todos.retain(|todo| todo.id == id)
+    }
+
+    pub fn get_all(&self) -> &Vec<Todo> {
+        &self.todos
     }
 }
