@@ -8,3 +8,4 @@ nanoid = "0.4.0"
 console = "0.15.5"
 dialoguer = "0.10.3"
 colorful = "0.2.2"
+ctrlc = { version = "3.0", features = ["termination"] }

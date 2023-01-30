@@ -2,7 +2,7 @@ use super::constants::TITLE_TEXT;
 use colorful::{Color, Colorful};
 use console::Term;
 use dialoguer::{theme::ColorfulTheme, Select};
-use std::io;
+use std::io::{self, Write};
 
 pub struct Action<'a> {
     pub label: &'static str,
@@ -44,6 +44,9 @@ pub enum Message {
     HereYourTodos,
     WhatToDo,
     Title,
+    TodoTitle,
+    TodoDescription,
+    TodoAdded,
 }
 
 pub fn print_message(message: Message) {
@@ -52,9 +55,31 @@ pub fn print_message(message: Message) {
             "{}",
             "You haven't chosen anything, i'm leaving, see you soon!".red()
         ),
-        Message::NoTodos => println!("{}", "You have no todos!".yellow()),
+        Message::NoTodos => println!("{} {}", "!".yellow(), "You have no todos :(".bold()),
         Message::HereYourTodos => println!("{}", "Here are your todos!".yellow()),
-        Message::WhatToDo => println!("{} {}", "?".yellow(), "What do you want me to do?".bold()),
+        Message::WhatToDo => println!(
+            "{} {} {}",
+            "?".yellow(),
+            "What do you want me to do?".bold(),
+            "(you can press <esc> or <q> to exit)"
+        ),
         Message::Title => println!("{}", TITLE_TEXT.gradient(Color::Red)),
+        Message::TodoTitle => {
+            print!(
+                "{} {}",
+                "?".yellow(),
+                "What title should your todo have? ".bold(),
+            );
+            io::stdout().flush().unwrap();
+        }
+        Message::TodoDescription => {
+            print!(
+                "{} {}",
+                "?".yellow(),
+                "What description should your todo have? ".bold()
+            );
+            io::stdout().flush().unwrap();
+        }
+        Message::TodoAdded => println!("{} {}", "!".yellow(), "Todo added!".bold()),
     }
 }
