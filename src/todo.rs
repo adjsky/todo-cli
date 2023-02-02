@@ -34,10 +34,14 @@ impl Todos {
     }
 
     pub fn remove(&mut self, id: &str) {
-        self.todos.retain(|todo| todo.id == id)
+        self.todos.retain(|todo| todo.id != id)
     }
 
     pub fn get_all(&self) -> &Vec<Todo> {
         &self.todos
+    }
+
+    pub fn get(&self, index: usize) -> &Todo {
+        &self.todos[index]
     }
 }

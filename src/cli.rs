@@ -1,4 +1,5 @@
 use super::constants::TITLE_TEXT;
+use crate::todo::Todo;
 use colorful::{Color, Colorful};
 use console::Term;
 use dialoguer::{theme::ColorfulTheme, Select};
@@ -6,18 +7,21 @@ use std::io::{self, Write};
 
 pub struct Action<'a> {
     pub label: &'static str,
-    pub action: Box<dyn FnMut() + 'a>,
+    pub action: Option<Box<dyn FnMut() + 'a>>,
 }
 
-pub fn prompt_action(actions: &mut [Action]) -> Option<()> {
-    print_message(Message::WhatToDo);
+pub fn prompt_action(actions: &mut [Action], message: Message) -> Option<()> {
+    print_message(message);
 
     let labels: Vec<&str> = actions.iter().map(|action| action.label).collect();
 
     let result = display_selection(&labels);
     let index = result.ok().flatten()?;
 
-    (actions[index].action)();
+    let action = &mut actions[index].action;
+    if let Some(action) = action {
+        action();
+    }
 
     Some(())
 }
@@ -38,15 +42,16 @@ pub fn read_line() -> Option<String> {
     }
 }
 
-pub enum Message {
+pub enum Message<'a> {
     NothingChosen,
     NoTodos,
-    HereYourTodos,
     WhatToDo,
+    WhatToDoWithTodo,
     Title,
-    TodoTitle,
-    TodoDescription,
+    PromptTitle,
+    PromptDescription,
     TodoAdded,
+    TodoInformation(&'a Todo),
 }
 
 pub fn print_message(message: Message) {
@@ -56,15 +61,19 @@ pub fn print_message(message: Message) {
             "You haven't chosen anything, i'm leaving, see you soon!".red()
         ),
         Message::NoTodos => println!("{} {}", "!".yellow(), "You have no todos :(".bold()),
-        Message::HereYourTodos => println!("{}", "Here are your todos!".yellow()),
         Message::WhatToDo => println!(
             "{} {} {}",
             "?".yellow(),
             "What do you want me to do?".bold(),
             "(you can press <esc> or <q> to exit)"
         ),
+        Message::WhatToDoWithTodo => println!(
+            "{} {}",
+            "?".yellow(),
+            "Do you want to do something with this todo?".bold(),
+        ),
         Message::Title => println!("{}", TITLE_TEXT.gradient(Color::Red)),
-        Message::TodoTitle => {
+        Message::PromptTitle => {
             print!(
                 "{} {}",
                 "?".yellow(),
@@ -72,7 +81,7 @@ pub fn print_message(message: Message) {
             );
             io::stdout().flush().unwrap();
         }
-        Message::TodoDescription => {
+        Message::PromptDescription => {
             print!(
                 "{} {}",
                 "?".yellow(),
@@ -81,5 +90,18 @@ pub fn print_message(message: Message) {
             io::stdout().flush().unwrap();
         }
         Message::TodoAdded => println!("{} {}", "!".yellow(), "Todo added!".bold()),
+        Message::TodoInformation(todo) => {
+            println!(
+                "{} {}\n{}: {}\n{}: {}\n{}: {}",
+                "!".yellow(),
+                "Todo information!".bold(),
+                "Title".yellow().bold(),
+                todo.title,
+                "Description".yellow().bold(),
+                todo.description,
+                "Done".yellow().bold(),
+                todo.done
+            )
+        }
     }
 }
