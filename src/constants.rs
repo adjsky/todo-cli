@@ -6,3 +6,5 @@ pub const TITLE_TEXT: &str = "  _______ ____  _____   ____             _____  __
    |_|  \\____/|_____/ \\____/  /_/    \\_\\_|    |_|     
                                                       
 ";
+
+pub const SAVE_PATH: &str = "./data.json";

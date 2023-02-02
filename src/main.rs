@@ -7,8 +7,11 @@ use todo_rust::todo::Todos;
 fn main() {
     setup_ctrlc();
 
-    let todos = RefCell::new(Todos::new());
-    let mut actions = get_actions(&todos);
+    let mut todos = Todos::new();
+    let _ = todos.deserialize();
+
+    let todos_rc = RefCell::new(todos);
+    let mut actions = get_actions(&todos_rc);
 
     print_message(Message::Title);
 
